@@ -18,7 +18,6 @@ const TEACHER = {
     ['Amaliyot', 'Sud va adliya tizimida amaliy tajriba'],
     ['Hozirda', "IIV akademik litsey huquqshunoslik fani o'qituvchisi"],
   ] as [string, string][],
-  group: "Kechki guruh: 18:00–20:00, online darslar ham bor",
   docs: [['landing/diplom-bakalavr.jpg', 'Bakalavr diplomi · TDYU · 2025'], ['landing/diplom-magistr.jpg', 'Magistr diplomi · TDYU · 2026']] as [string, string][],
   facts: [['186,9', 'DTM bali'], ['3', "qo'llanma qismi"], ['2000+', 'test']] as [string, string][],
 }
@@ -151,7 +150,6 @@ export default function Landing() {
                 <li key={k} className="flex gap-3 text-sm leading-snug"><span className="w-28 shrink-0 font-semibold text-[#13294b]">{k}</span><span className="text-slate-600">{v}</span></li>
               ))}
             </ul>
-            <p className="mb-4 mt-0 rounded-xl bg-orange-50 px-4 py-3 text-sm font-semibold text-[#13294b]">🕕 {TEACHER.group}<br /><span className="font-normal">Ro'yxatdan o'tish: <a href={TEL}>{PHONE}</a> · <a href="https://t.me/Oybeck" target="_blank" rel="noreferrer">@Oybeck</a></span></p>
             <div className="mt-5 flex gap-3">
               {TEACHER.facts.map(([n, l]) => (
                 <div key={l} className="flex-1 rounded-2xl border border-line bg-bg p-3 text-center">
