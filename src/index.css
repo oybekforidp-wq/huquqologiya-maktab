@@ -21,3 +21,25 @@ input, select, textarea, button { font: inherit; }
 @utility input { @apply h-12 w-full rounded-xl border border-field bg-white px-3.5 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand-soft; }
 @utility card { @apply bg-white border border-line rounded-2xl; }
 @utility label { @apply flex flex-col gap-1.5 text-sm font-medium; }
+
+/* ---- Landing ---- */
+.ld { --navy: #13294b; --red: #d7262f; --orange: #f39a2b; color: var(--navy); overflow-x: clip; }
+.ld-rv { opacity: 0; transform: translateY(28px) scale(.98); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+.ld-rv.in { opacity: 1; transform: none; }
+.ld-stage { perspective: 1200px; }
+.ld-fan { --w: clamp(70px, 20vw, 140px); position: relative; height: calc(var(--w) * 1.5); transform-style: preserve-3d; }
+.ld-book { position: absolute; top: 12px; left: 50%; width: var(--w); aspect-ratio: 467/662; margin-left: calc(var(--w) * (var(--i) * 1.0 - .5)); transform-style: preserve-3d; transform: rotateY(var(--ry)) translateZ(var(--z)); animation: ld-float 6s ease-in-out infinite; animation-delay: var(--ad, 0s); }
+.ld-book img { width: 100%; height: 100%; border-radius: 4px 10px 10px 4px; box-shadow: -6px 10px 30px rgba(0,0,0,.45), inset 4px 0 6px rgba(0,0,0,.15); display: block; }
+.ld-book::after { content: ""; position: absolute; left: 0; top: 2%; bottom: 2%; width: 6px; background: linear-gradient(90deg, rgba(0,0,0,.35), transparent); border-radius: 4px 0 0 4px; }
+@keyframes ld-float { 0%,100% { translate: 0 0; } 50% { translate: 0 -14px; } }
+.ld-tilt { transition: transform .4s ease; transform: perspective(1000px) rotateY(var(--ry, 0deg)) rotateX(var(--rx, 0deg)); transform-style: preserve-3d; }
+.ld-glow { background: radial-gradient(60% 60% at 50% 40%, rgba(243,154,43,.35), transparent 70%); }
+.ld-hero { background: radial-gradient(80% 60% at 80% 10%, rgba(215,38,47,.28), transparent 60%), radial-gradient(70% 60% at 10% 90%, rgba(243,154,43,.2), transparent 60%), linear-gradient(160deg, #0d1d38, #13294b 60%, #1a3866); }
+.ld-grad-text { background: linear-gradient(90deg, #ff5a63, #f39a2b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ld-card3d { transition: transform .35s ease, box-shadow .35s ease; }
+.ld-card3d:hover { transform: perspective(900px) rotateX(3deg) translateY(-6px); box-shadow: 0 24px 40px -18px rgba(19,41,75,.35); }
+@media (prefers-reduced-motion: reduce) {
+  .ld-rv { opacity: 1; transform: none; transition: none; }
+  .ld-book { animation: none; }
+  .ld-card3d, .ld-tilt { transition: none; }
+}

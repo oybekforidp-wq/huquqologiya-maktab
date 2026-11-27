@@ -1,4 +1,8 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { Spinner } from './ui'
+import { RatingModal, type PendingRating } from './RatingGate'
 import { useAuth } from '../lib/auth'
 import { initials } from '../lib/format'
 import { Icon } from './Icon'
@@ -17,18 +21,41 @@ const STAFF: Item[] = [
   { to: '/vazifalar', label: 'Vazifalar', icon: 'tasks' },
   { to: '/jurnal', label: 'Jurnal', icon: 'journal' },
 ]
+const PARENT: Item[] = [
+  { to: '/', label: 'Farzandlarim', icon: 'users', end: true },
+  { to: '/fikr', label: 'Fikr va baho', icon: 'grades' },
+]
 const ADMIN: Item[] = [
   { to: '/admin/arizalar', label: 'Arizalar', icon: 'inbox' },
   { to: '/admin/fanlar', label: 'Fanlar va guruhlar', icon: 'book' },
   { to: '/admin/foydalanuvchilar', label: 'Foydalanuvchilar', icon: 'users' },
+  { to: '/admin/reyting', label: "Ustoz reytingi", icon: 'grades' },
 ]
 
-const roleLabel = { student: "O'quvchi", teacher: "O'qituvchi", admin: 'Admin' }
+const roleLabel = { student: "O'quvchi", teacher: "O'qituvchi", admin: 'Admin', parent: 'Ota-ona' }
 
 export function Layout() {
   const { profile, signOut } = useAuth()
+  const loc = useLocation()
+  const isStudent = profile?.role === 'student'
+  // O'quvchi: tugagan darsni baholamaguncha ilovadan foydalana olmaydi
+  const [pending, setPending] = useState<PendingRating | null>(null)
+  const [checked, setChecked] = useState(!isStudent)
+  const check = useCallback(async () => {
+    if (!isStudent) return
+    const { data } = await supabase.rpc('pending_rating')
+    setPending(((data as PendingRating[] | null) ?? [])[0] ?? null)
+    setChecked(true)
+  }, [isStudent])
+  useEffect(() => { check() }, [check, loc.pathname])
+  useEffect(() => {
+    if (!isStudent) return
+    const t = setInterval(check, 60000)
+    return () => clearInterval(t)
+  }, [isStudent, check])
+
   if (!profile) return null
-  const main = profile.role === 'student' ? STUDENT : STAFF
+  const main = profile.role === 'parent' ? PARENT : profile.role === 'student' ? STUDENT : STAFF
   const extra = profile.role === 'admin' ? ADMIN : []
 
   const link = (it: Item) => (
@@ -73,10 +100,11 @@ export function Layout() {
       </header>
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-5 md:px-8 md:pb-10 md:pt-8">
-        <Outlet />
+        {!checked ? <Spinner /> : pending ? null : <Outlet />}
       </main>
+      {pending && <RatingModal p={pending} onDone={check} />}
 
-      <nav className="fixed inset-x-0 bottom-0 z-10 grid h-[68px] grid-cols-4 border-t border-line bg-white md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-10 grid h-[68px] border-t border-line bg-white md:hidden" style={{ gridTemplateColumns: `repeat(${main.length}, minmax(0, 1fr))` }}>
         {main.map((it) => (
           <NavLink key={it.to} to={it.to} end={it.end}
             className={({ isActive }) => `flex flex-col items-center justify-center gap-1 text-xs no-underline ${isActive ? 'font-semibold text-brand' : 'text-muted'}`}>

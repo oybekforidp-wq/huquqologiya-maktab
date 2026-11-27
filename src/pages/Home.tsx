@@ -5,6 +5,7 @@ import { useAuth } from '../lib/auth'
 import { myGroups } from '../lib/data'
 import { useQuery, must } from '../lib/useQuery'
 import { fmtDateTime } from '../lib/format'
+import { TeacherInsights } from '../components/TeacherInsights'
 import { Badge, Empty, Spinner, Stat } from '../components/ui'
 import { KIND_LABEL, type Assignment, type Lesson, type Submission } from '../lib/types'
 
@@ -59,6 +60,8 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {profile!.role === 'teacher' && <TeacherInsights />}
 
       {!gid ? (
         <Empty title={isStudent ? "Siz hali guruhga qo'shilmagansiz" : "Sizga hali guruh biriktirilmagan"}

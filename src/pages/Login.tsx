@@ -2,12 +2,16 @@ import { useState, type FormEvent } from 'react'
 import { supabase, loginToEmail, LOGIN_RE } from '../lib/supabase'
 import { errText } from '../lib/format'
 import { ErrorBox } from '../components/ui'
+import { ROLE_LABEL } from '../lib/types'
+
+type SignupRole = 'student' | 'teacher' | 'parent'
+const SIGNUP_ROLES: SignupRole[] = ['student', 'teacher', 'parent']
 
 export default function Login() {
   const [mode, setMode] = useState<'in' | 'up'>('in')
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
-  const [f, setF] = useState({ name: '', phone: '+998 ', login: '', password: '' })
+  const [f, setF] = useState({ name: '', phone: '+998 ', login: '', password: '', role: 'student' as SignupRole, child: '' })
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value })
 
   async function submit(e: FormEvent) {
@@ -22,11 +26,13 @@ export default function Login() {
       } else {
         if (f.name.trim().split(/\s+/).length < 2) throw new Error('Ism va familiyani to\'liq yozing')
         if (f.phone.replace(/\D/g, '').length < 12) throw new Error("Telefon raqamni to'liq yozing: +998 XX XXX XX XX")
+        const child = f.child.trim().toLowerCase()
+        if (f.role === 'parent' && !LOGIN_RE.test(child)) throw new Error("Farzandingiz loginini to'g'ri yozing")
         const { data: free } = await supabase.rpc('login_available', { p_login: login })
         if (free === false) throw new Error('Bu login band, boshqasini tanlang')
         const { error } = await supabase.auth.signUp({
           email: loginToEmail(login), password: f.password,
-          options: { data: { full_name: f.name.trim(), phone: f.phone.trim(), login } },
+          options: { data: { full_name: f.name.trim(), phone: f.phone.trim(), login, requested_role: f.role, ...(f.role === 'parent' ? { child_login: child } : {}) } },
         })
         if (error) throw error
       }
@@ -63,8 +69,20 @@ export default function Login() {
           <form onSubmit={submit} className="flex flex-col gap-4">
             {mode === 'up' && (
               <>
+                <fieldset className="m-0 flex flex-col gap-1.5 border-0 p-0">
+                  <legend className="mb-1.5 p-0 text-sm font-medium">Siz kimsiz?</legend>
+                  <div className="grid grid-cols-3 gap-2">
+                    {SIGNUP_ROLES.map((r) => (
+                      <button key={r} type="button" aria-pressed={f.role === r} onClick={() => setF({ ...f, role: r })}
+                        className={`h-11 cursor-pointer rounded-xl text-sm ${f.role === r ? 'border-0 bg-brand font-semibold text-white' : 'border border-field bg-white text-ink'}`}>{ROLE_LABEL[r]}</button>
+                    ))}
+                  </div>
+                </fieldset>
                 <label className="label">Ism va familiya<input className="input" required value={f.name} onChange={set('name')} placeholder="Aziza Karimova" autoComplete="name" /></label>
                 <label className="label">Telefon raqam<input className="input" required type="tel" value={f.phone} onChange={set('phone')} autoComplete="tel" /></label>
+                {f.role === 'parent' && (
+                  <label className="label">Farzandingiz logini<input className="input" required value={f.child} onChange={set('child')} placeholder="farzandingiz ro'yxatdan o'tgan login" autoCapitalize="none" /></label>
+                )}
               </>
             )}
             <label className="label">Login<input className="input" required value={f.login} onChange={set('login')} placeholder="masalan, aziza_08" autoCapitalize="none" autoComplete="username" /></label>

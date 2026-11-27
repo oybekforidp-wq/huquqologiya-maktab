@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
@@ -10,6 +10,10 @@ import { Icon } from '../components/Icon'
 import { KIND_LABEL, type Assignment, type Profile, type Submission } from '../lib/types'
 
 const L = ['A', 'B', 'C', 'D', 'E', 'F']
+
+// Student view only: block copying question text and pasting/dropping answers.
+const stop = (e: { preventDefault: () => void }) => e.preventDefault()
+const noCopy = { onCopy: stop, onCut: stop, onContextMenu: stop }
 
 export default function TaskPage() {
   const { id } = useParams()
@@ -29,7 +33,7 @@ export default function TaskPage() {
   return (
     <>
       <PageHead back="/vazifalar" title={t.title} sub={`${KIND_LABEL[t.kind]}${t.due_at ? ` · muddat: ${fmtDateTime(t.due_at)}` : ''} · ${t.max_score} ball`} />
-      {t.instructions && <div className="card mb-5 whitespace-pre-wrap p-5 text-[17px] leading-relaxed">{t.instructions}</div>}
+      {t.instructions && <div className={`card mb-5 whitespace-pre-wrap p-5 text-[17px] leading-relaxed${teaches.data ? '' : ' select-none'}`} {...(teaches.data ? {} : noCopy)}>{t.instructions}</div>}
       {teaches.data ? <Review task={t} /> : t.kind === 'test'
         ? <TestRun task={t} sub={mine.data} onDone={() => { mine.reload(); task.reload() }} />
         : <Answer task={t} sub={mine.data} uid={profile!.id} onDone={mine.reload} />}
@@ -72,8 +76,8 @@ function TestRun({ task, sub, onDone }: { task: Assignment; sub: Submission | nu
       </aside>
       <div className="flex min-w-0 flex-col gap-4">
         <div className="text-sm font-semibold text-muted">Savol {i + 1} / {qs.length}</div>
-        <div className="card p-5 text-xl font-semibold leading-snug">{q.q}</div>
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="card select-none p-5 text-xl font-semibold leading-snug" {...noCopy}>{q.q}</div>
+        <div className="grid select-none gap-3 md:grid-cols-2" {...noCopy}>
           {q.o.map((o, k) => {
             const isPicked = picked === k
             const tone = done ? (right(k) ? 'border-green-600 bg-green-50' : isPicked ? 'border-red-600 bg-red-50' : 'border-field bg-white') : isPicked ? 'border-brand bg-brand-soft' : 'border-field bg-white'
@@ -102,6 +106,13 @@ function Answer({ task, sub, uid, onDone }: { task: Assignment; sub: Submission 
   const [files, setFiles] = useState<string[]>(sub?.file_paths ?? [])
   const [busy, setBusy] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(null)
+  const [pasteWarn, setPasteWarn] = useState(false)
+  useEffect(() => {
+    if (!pasteWarn) return
+    const t = setTimeout(() => setPasteWarn(false), 3000)
+    return () => clearTimeout(t)
+  }, [pasteWarn])
+  const blockInput = (e: { preventDefault: () => void }) => { e.preventDefault(); setPasteWarn(true) }
   const graded = sub?.score != null
   const add = async (list: FileList) => {
     setBusy('Yuklanmoqda…'); setErr(null)
@@ -128,7 +139,10 @@ function Answer({ task, sub, uid, onDone }: { task: Assignment; sub: Submission 
       )}
       {sub && !graded && <div className="rounded-xl bg-brand-soft px-4 py-3 text-sm text-brand-dark">Javobingiz yuborildi, o'qituvchi tekshiryapti. Tekshirilguncha o'zgartirishingiz mumkin.</div>}
       {task.kind !== 'file' && (
-        <label className="label">Javobingiz<textarea className="input min-h-48 py-3 text-base" disabled={graded} value={text} onChange={(e) => setText(e.target.value)} placeholder={task.kind === 'kazus' ? "Vaziyatga huquqiy baho bering, tegishli qonun moddasini ko'rsating…" : ''} /></label>
+        <>
+          <label className="label">Javobingiz<textarea className="input min-h-48 py-3 text-base" disabled={graded} value={text} onChange={(e) => setText(e.target.value)} onPaste={blockInput} onDrop={blockInput} placeholder={task.kind === 'kazus' ? "Vaziyatga huquqiy baho bering, tegishli qonun moddasini ko'rsating…" : ''} /></label>
+          {pasteWarn && <div className="text-sm font-semibold text-red-600">Javobni o'zingiz yozing — nusxa qo'yish o'chirilgan</div>}
+        </>
       )}
       <div className="flex flex-wrap items-center gap-3">
         {!graded && <label className="btn-ghost cursor-pointer"><Icon name="upload" size={18} />{task.kind === 'file' ? 'Rasm yoki fayl yuklash' : 'Fayl biriktirish'}
