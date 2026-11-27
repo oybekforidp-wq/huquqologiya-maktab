@@ -5,7 +5,8 @@ import { Spinner } from './components/ui'
 import Login from './pages/Login'
 import Pending from './pages/Pending'
 import Home from './pages/Home'
-import Soon from './pages/Soon'
+import Journal from './pages/Journal'
+import Grades from './pages/Grades'
 import Lessons from './pages/Lessons'
 import LessonPage from './pages/LessonPage'
 import Tasks from './pages/Tasks'
@@ -28,8 +29,8 @@ function Gate() {
         <Route path="dars/:id" element={<LessonPage />} />
         <Route path="vazifalar" element={<Tasks />} />
         <Route path="vazifa/:id" element={<TaskPage />} />
-        <Route path="baholar" element={<Soon title="Baholarim" />} />
-        <Route path="jurnal" element={<Soon title="Jurnal" />} />
+        <Route path="baholar" element={<Grades />} />
+        <Route path="jurnal" element={<Journal />} />
         {admin && <Route path="admin/arizalar" element={<Applications />} />}
         {admin && <Route path="admin/fanlar" element={<Subjects />} />}
         {admin && <Route path="admin/foydalanuvchilar" element={<Users />} />}
