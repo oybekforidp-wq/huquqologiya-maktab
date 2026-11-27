@@ -6,7 +6,7 @@ const TEACHER = {
   name: "Po'latjonov Oybek",
   role: "Huquqologiya o'quv kursi ustozi",
   initials: 'OP',
-  photo: '' as string, // masalan: 'landing/ustoz.jpg' (public/ ichida). Bo'sh bo'lsa — bosh harflar chiqadi.
+  photo: 'landing/ustoz.jpg' as string, // masalan: 'landing/ustoz.jpg' (public/ ichida). Bo'sh bo'lsa — bosh harflar chiqadi.
   bio: [
     "Imtihondan o'zi yuqori natija bilan o'tgan ustoz sizga ham shu yo'lni o'rgatadi: qaysi mavzularga e'tibor berish, murakkab testlarni qanday yechish va imtihonda vaqtni qanday taqsimlash.",
     "\"Huquqologiya\" qo'llanmalari (I, II, III qism) va \"Testlar to'plami\" muallifi.",
