@@ -8,7 +8,7 @@ create table if not exists course_lessons (
   num int not null,
   title text not null,
   module text,
-  type text,                      -- yangi | amaliy | nazorat | takror
+  type text,                      -- yangi | amaliy | nazorat | takror | sinov
   pdf_path text,                  -- 'kurs' bucket ichidagi yo'l (o'quvchi nusxasi)
   key_path text,                  -- 'kurs' bucket ichidagi yo'l (kalit, faqat ustoz)
   content jsonb not null default '{}'::jsonb,  -- {sinf, uy, ochiq, kazus, yozma, case}
@@ -114,8 +114,9 @@ begin
      and not exists (select 1 from assignments where lesson_id = l.id and course_lesson_id = cl.id and title like '%uy testi') then
     insert into assignments (group_id, lesson_id, course_lesson_id, title, kind, instructions, questions, due_at, max_score)
     values (gid, l.id, cl.id,
-      case when cl.type = 'nazorat' then cl.num || '-dars: nazorat testi' else cl.num || '-dars: uy testi' end,
-      'test', case when cl.type = 'nazorat' then 'Nazorat ishi.' else 'Uy vazifasi.' end,
+      case when cl.type = 'nazorat' then cl.num || '-dars: nazorat testi'
+           when cl.type = 'sinov' then cl.num || '-dars: sinov imtihoni testi' else cl.num || '-dars: uy testi' end,
+      'test', case when cl.type = 'nazorat' then 'Nazorat ishi.' when cl.type = 'sinov' then 'Sinov imtihoni.' else 'Uy vazifasi.' end,
       c->'uy', l.starts_at + interval '2 days', 5);
     made := made + 1;
   end if;
