@@ -97,16 +97,16 @@ export default function Landing() {
             <img src={import.meta.env.BASE_URL + 'icon-192.png'} alt="" width={32} height={32} />Huquqologiya
           </a>
           <nav className="flex items-center gap-1 text-sm sm:gap-2">
-            <a href="tel:+998939778800" aria-label="Telefon: +998 93 977 88 00" className="flex items-center gap-2 rounded-lg p-2 text-white/90 no-underline hover:bg-white/10 hover:text-white">
+            <a href="tel:+998939778800" aria-label="Telefon: +998 93 977 88 00" className="flex h-10 items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 text-sm font-semibold text-white no-underline transition hover:bg-white/20">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" /></svg>
               <span className="hidden lg:inline">+998 93 977 88 00</span>
             </a>
-            <a href="https://t.me/huquqologiya_admin" target="_blank" rel="noreferrer" aria-label="Telegram: @huquqologiya_admin" className="flex items-center gap-2 rounded-lg p-2 text-white/90 no-underline hover:bg-white/10 hover:text-white">
+            <a href="https://t.me/huquqologiya_admin" target="_blank" rel="noreferrer" aria-label="Telegram: @huquqologiya_admin" className="flex h-10 items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 text-sm font-semibold text-white no-underline transition hover:bg-white/20">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M21.9 3.6 2.6 11c-1.3.5-1.3 1.3-.2 1.6l4.9 1.5 1.9 5.8c.2.6.1.9.8.9.5 0 .8-.2 1.1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.8l3.2-15.2c.3-1.3-.5-1.9-1.5-1.5zM8.4 13.6l9.6-6c.5-.3.9-.1.5.2l-7.9 7.1-.3 3.3z" /></svg>
               <span className="hidden md:inline">@huquqologiya_admin</span>
             </a>
-            <a href="#kitoblar" className="hidden px-3 text-white/80 no-underline hover:text-white sm:inline">Kitoblar</a>
-            <a href="#kontakt" className="hidden px-3 text-white/80 no-underline hover:text-white sm:inline">Kontaktlar</a>
+            <a href="#kitoblar" className="hidden h-10 items-center rounded-full bg-[#f39a2b] px-4 text-sm font-semibold text-[#13294b] no-underline shadow-md transition hover:-translate-y-0.5 hover:bg-[#ffb04d] sm:inline-flex">Kitoblar</a>
+            <a href="#kontakt" className="hidden h-10 items-center rounded-full bg-[#d7262f] px-4 text-sm font-semibold text-white no-underline shadow-md transition hover:-translate-y-0.5 hover:bg-[#e53a43] sm:inline-flex">Kontaktlar</a>
             <Link to="/kirish" className="rounded-lg border border-white/40 px-4 py-2 font-semibold text-white no-underline hover:bg-white/10">Kirish</Link>
           </nav>
         </div>
