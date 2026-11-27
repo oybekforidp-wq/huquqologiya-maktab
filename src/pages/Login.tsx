@@ -42,7 +42,7 @@ export default function Login() {
     <div className="min-h-dvh lg:flex">
       <section className="hidden w-[42%] flex-col gap-9 bg-ink p-16 text-white lg:flex">
         <div className="flex items-center gap-3">
-          <img src="/icon.svg" alt="" width={48} height={48} />
+          <img src={import.meta.env.BASE_URL + "icon.svg"} alt="" width={48} height={48} />
           <span className="font-display text-2xl font-bold">Huquqologiya</span>
         </div>
         <div className="flex flex-1 flex-col justify-center gap-6">
@@ -55,7 +55,7 @@ export default function Login() {
       <section className="flex flex-1 items-center justify-center px-5 py-10">
         <div className="flex w-full max-w-md flex-col gap-6">
           <div className="flex flex-col items-center gap-2 lg:hidden">
-            <img src="/icon.svg" alt="" width={60} height={60} />
+            <img src={import.meta.env.BASE_URL + "icon.svg"} alt="" width={60} height={60} />
             <div className="font-display text-3xl font-bold">Huquqologiya</div>
             <div className="text-sm text-muted">Onlayn maktab</div>
           </div>

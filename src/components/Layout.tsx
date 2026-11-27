@@ -42,7 +42,7 @@ export function Layout() {
     <div className="min-h-dvh md:flex">
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-1 border-r border-line bg-white p-4 md:flex">
         <div className="flex items-center gap-2.5 px-2 pb-5 pt-1">
-          <img src="/icon.svg" alt="" width={34} height={34} />
+          <img src={import.meta.env.BASE_URL + "icon.svg"} alt="" width={34} height={34} />
           <span className="font-display text-xl font-bold">Huquqologiya</span>
         </div>
         {main.map(link)}
@@ -62,7 +62,7 @@ export function Layout() {
       </aside>
 
       <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b border-line bg-white px-4 md:hidden">
-        <img src="/icon.svg" alt="" width={28} height={28} />
+        <img src={import.meta.env.BASE_URL + "icon.svg"} alt="" width={28} height={28} />
         <span className="flex-1 font-display text-lg font-bold">Huquqologiya</span>
         {extra.length > 0 && (
           <NavLink to="/admin/arizalar" className="rounded-lg px-2 py-1 text-sm font-semibold text-brand no-underline">Admin</NavLink>

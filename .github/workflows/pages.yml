@@ -23,7 +23,7 @@ jobs:
       - run: npm run build
         env:
           # Sayt huquqologiya.uz domenining ildizida ishlaydi
-          BASE_PATH: /
+          BASE_PATH: /huquqologiya-maktab/
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
         with:
