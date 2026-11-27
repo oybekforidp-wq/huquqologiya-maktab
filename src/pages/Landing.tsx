@@ -300,6 +300,12 @@ export default function Landing() {
           </div>
         </div>
       </section>
+      <nav aria-label="Huquq fanidan ochiq materiallar" className="flex flex-wrap justify-center gap-x-6 gap-y-3 bg-[#0d1d38] px-4 pt-6 text-sm text-white">
+        <a href="/milliy-sertifikat/">Milliy sertifikatga tayyorgarlik</a>
+        <a href="/huquq-testlari/">Huquq testlari</a>
+        <a href="/kitoblar/">Huquqologiya kitoblari</a>
+        <a href="/maqolalar/">Huquqiy maqolalar</a>
+      </nav>
       <footer className="bg-[#0d1d38] px-4 py-6 text-center text-sm text-slate-400">© {new Date().getFullYear()} Huquqologiya · Onlayn maktab</footer>
     </div>
   )
