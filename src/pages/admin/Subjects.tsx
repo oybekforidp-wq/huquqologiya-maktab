@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
 import { getGroups, getProfiles, getSubjects } from '../../lib/data'
 import { useQuery, must } from '../../lib/useQuery'
-import { Empty, ErrorBox, PageHead, Spinner } from '../../components/ui'
+import { Badge, Empty, ErrorBox, PageHead, Spinner } from '../../components/ui'
 import { Icon } from '../../components/Icon'
 import type { Profile } from '../../lib/types'
 
@@ -11,7 +11,7 @@ export default function Subjects() {
   const groups = useQuery(getGroups)
   const staff = useQuery(async () => (await getProfiles({ status: 'active' })).filter((p) => p.role !== 'student'))
   const students = useQuery(() => getProfiles({ status: 'active', role: 'student' }))
-  const members = useQuery(() => must<{ group_id: string; student_id: string }[]>(supabase.from('enrollments').select('group_id, student_id')))
+  const members = useQuery(() => must<{ group_id: string; student_id: string; paid_until: string | null }[]>(supabase.from('enrollments').select('group_id, student_id, paid_until')))
   const [err, setErr] = useState<string | null>(null)
   const [newSubject, setNewSubject] = useState('')
   const [newGroup, setNewGroup] = useState<Record<string, string>>({})
@@ -70,8 +70,9 @@ export default function Subjects() {
                       {isOpen && (
                         <div className="flex flex-col gap-2 border-t border-line p-3">
                           {mem.map((m) => (
-                            <div key={m.student_id} className="flex items-center gap-2 text-sm">
-                              <span className="flex-1">{byId.get(m.student_id)?.full_name ?? '—'}</span>
+                            <div key={m.student_id} className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-2 text-sm">
+                              <span className="min-w-32 flex-1">{byId.get(m.student_id)?.full_name ?? '—'}</span>
+                              <Paid until={m.paid_until} set={(d) => run(() => supabase.from('enrollments').update({ paid_until: d }).eq('group_id', g.id).eq('student_id', m.student_id), members)} />
                               <button className="btn-ghost h-9 text-sm" onClick={() => run(() => supabase.from('enrollments').delete().eq('group_id', g.id).eq('student_id', m.student_id), members)}>Chiqarish</button>
                             </div>
                           ))}
@@ -100,5 +101,22 @@ export default function Subjects() {
         })}
       </div>
     </>
+  )
+}
+
+const today = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Tashkent' })
+const plusMonth = (from: string) => { const d = new Date(from + 'T12:00:00'); d.setMonth(d.getMonth() + 1); return d.toISOString().slice(0, 10) }
+const fmtD = (d: string) => d.split('-').reverse().join('.')
+
+// To'lov: "+1 oy" muddatni bugundan (yoki amaldagi muddat oxiridan) bir oyga uzaytiradi
+function Paid({ until, set }: { until: string | null; set: (d: string | null) => void }) {
+  const t = today()
+  const ok = !!until && until >= t
+  return (
+    <span className="flex items-center gap-2">
+      {ok ? <Badge color="green">To'langan: {fmtD(until!)} gacha</Badge> : <Badge color="amber">{until ? `Muddati tugagan (${fmtD(until)})` : "To'lanmagan · faqat 1-dars"}</Badge>}
+      <button className="btn-ghost h-9 px-3 text-sm" onClick={() => set(plusMonth(ok ? until! : t))}>To'ladi +1 oy</button>
+      {until && <button className="btn-ghost h-9 px-3 text-sm" onClick={() => confirm("To'lov belgisi olib tashlansinmi?") && set(null)}>Bekor</button>}
+    </span>
   )
 }

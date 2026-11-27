@@ -7,7 +7,8 @@ import { useQuery, must } from '../lib/useQuery'
 import { fmtDateTime } from '../lib/format'
 import { Badge, ErrorBox, PageHead, Spinner } from '../components/ui'
 import { Icon } from '../components/Icon'
-import { KIND_LABEL, type Assignment, type Lesson, type Profile } from '../lib/types'
+import { KIND_LABEL, type Assignment, type Lesson, type LessonLinks, type Profile } from '../lib/types'
+import { PayNote } from './Lessons'
 
 const Board = lazy(() => import('../components/Board').then((m) => ({ default: m.Board })))
 
@@ -16,13 +17,18 @@ export default function LessonPage() {
   const { profile } = useAuth()
   const lesson = useQuery(() => must<Lesson>(supabase.from('lessons').select('*').eq('id', id!).single()), [id])
   const [canEdit, setCanEdit] = useState(false)
+  const [open, setOpen] = useState<boolean | null>(null)
+  const links = useQuery(async () => id ? ((await supabase.from('lesson_links').select('meeting_url, recording_url').eq('lesson_id', id).maybeSingle()).data as LessonLinks | null) : null, [id, open])
   const [err, setErr] = useState<string | null>(null)
   const l = lesson.data
 
   useEffect(() => {
     if (!l) return
     supabase.rpc('teaches', { gid: l.group_id }).then(({ data }) => setCanEdit(!!data))
-    if (profile!.role === 'student') supabase.rpc('join_lesson', { p_lesson: l.id })
+    supabase.rpc('lesson_open', { lid: l.id }).then(({ data }) => {
+      setOpen(!!data)
+      if (data && profile!.role === 'student') supabase.rpc('join_lesson', { p_lesson: l.id })
+    })
   }, [l?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Dars holati (jonli/yakunlangan) o'zgarsa darhol yangilanadi
@@ -36,6 +42,14 @@ export default function LessonPage() {
 
   if (lesson.loading && !l) return <Spinner />
   if (!l) return <ErrorBox text="Dars topilmadi" />
+  if (open === null) return <Spinner />
+  if (!open) return (
+    <>
+      <PageHead back="/darslar" title={l.title} sub={fmtDateTime(l.starts_at)} right={<Badge color="amber">🔒 Yopiq</Badge>} />
+      <PayNote />
+    </>
+  )
+  const lk = links.data
 
   const set = async (patch: Partial<Lesson>) => {
     setErr(null)
@@ -48,14 +62,14 @@ export default function LessonPage() {
       <PageHead back="/darslar" title={l.title} sub={fmtDateTime(l.starts_at)}
         right={<div className="flex flex-wrap items-center gap-2">
           {l.is_live ? <Badge color="red">● Jonli</Badge> : l.ended_at ? <Badge>Yakunlangan</Badge> : <Badge color="blue">Rejada</Badge>}
-          {l.meeting_url && !l.ended_at && <a href={l.meeting_url} target="_blank" rel="noreferrer" className="btn-primary no-underline">Video darsga kirish</a>}
+          {lk?.meeting_url && !l.ended_at && <a href={lk.meeting_url} target="_blank" rel="noreferrer" className="btn-primary no-underline">Video darsga kirish</a>}
           {canEdit && !l.is_live && !l.ended_at && <button className="btn-primary" onClick={() => set({ is_live: true })}>Darsni boshlash</button>}
           {canEdit && l.is_live && <button className="btn-ghost" onClick={() => confirm('Dars yakunlansinmi? Doska saqlanadi.') && set({ is_live: false, ended_at: new Date().toISOString() })}>Darsni yakunlash</button>}
         </div>} />
       {err && <div className="mb-4"><ErrorBox text={err} /></div>}
 
-      {l.recording_url && (
-        <a href={l.recording_url} target="_blank" rel="noreferrer" className="card mb-5 flex items-center gap-3 p-4 font-semibold no-underline">▶ Dars videosini ko'rish</a>
+      {lk?.recording_url && (
+        <a href={lk.recording_url} target="_blank" rel="noreferrer" className="card mb-5 flex items-center gap-3 p-4 font-semibold no-underline">▶ Dars videosini ko'rish</a>
       )}
 
       <section className="mb-6">
@@ -68,7 +82,7 @@ export default function LessonPage() {
       <div className="grid gap-5 lg:grid-cols-2">
         <Files lessonId={l.id} canEdit={canEdit} />
         <LessonTasks lesson={l} />
-        {canEdit && <Settings lesson={l} save={set} />}
+        {canEdit && !links.loading && <Settings lesson={l} links={lk} save={set} saveLinks={async (v) => { setErr(null); const { error } = await supabase.from('lesson_links').upsert({ lesson_id: l.id, ...v }); if (error) setErr(error.message); else links.reload() }} />}
         {canEdit && <Attendance lesson={l} />}
       </div>
     </>
@@ -129,11 +143,11 @@ function LessonTasks({ lesson }: { lesson: Lesson }) {
   )
 }
 
-function Settings({ lesson, save }: { lesson: Lesson; save: (p: Partial<Lesson>) => Promise<void> }) {
+function Settings({ lesson, links, save, saveLinks }: { lesson: Lesson; links: LessonLinks | null; save: (p: Partial<Lesson>) => Promise<void>; saveLinks: (v: LessonLinks) => Promise<void> }) {
   const [title, setTitle] = useState(lesson.title)
   const [at, setAt] = useState(toLocalInput(lesson.starts_at))
-  const [url, setUrl] = useState(lesson.meeting_url ?? '')
-  const [rec, setRec] = useState(lesson.recording_url ?? '')
+  const [url, setUrl] = useState(links?.meeting_url ?? '')
+  const [rec, setRec] = useState(links?.recording_url ?? '')
   return (
     <section className="card flex flex-col gap-3 p-5">
       <h2 className="m-0 text-lg font-bold">Dars sozlamalari</h2>
@@ -141,7 +155,7 @@ function Settings({ lesson, save }: { lesson: Lesson; save: (p: Partial<Lesson>)
       <label className="label">Vaqti<input className="input" type="datetime-local" value={at} onChange={(e) => setAt(e.target.value)} /></label>
       <label className="label">Video havola (Zoom / Meet)<input className="input" value={url} onChange={(e) => setUrl(e.target.value)} /></label>
       <label className="label">Dars yozuvi havolasi (YouTube yopiq / Google Drive)<input className="input" value={rec} onChange={(e) => setRec(e.target.value)} /></label>
-      <div><button className="btn-primary" onClick={() => save({ title, starts_at: new Date(at).toISOString(), meeting_url: url || null, recording_url: rec || null })}>Saqlash</button></div>
+      <div><button className="btn-primary" onClick={async () => { await saveLinks({ meeting_url: url.trim() || null, recording_url: rec.trim() || null }); await save({ title, starts_at: new Date(at).toISOString() }) }}>Saqlash</button></div>
     </section>
   )
 }

@@ -16,8 +16,10 @@ export interface Group { id: string; subject_id: string; name: string; teacher_i
 
 export interface Lesson {
   id: string; group_id: string; title: string; starts_at: string
-  meeting_url: string | null; recording_url: string | null; is_live: boolean; ended_at: string | null
+  is_live: boolean; ended_at: string | null
 }
+export interface LessonLinks { meeting_url: string | null; recording_url: string | null }
+export interface GroupAccess { free_lesson: string | null; paid_until: string | null; paid: boolean; staff: boolean }
 
 export type AssignmentKind = 'test' | 'written' | 'file' | 'kazus'
 export interface Question { q: string; o: string[]; c?: number; a?: string }
