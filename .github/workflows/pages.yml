@@ -22,8 +22,8 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          # Maxsus domen ulanguncha sayt /huquqologiya-maktab/ ostida ishlaydi
-          BASE_PATH: ${{ vars.BASE_PATH || '/huquqologiya-maktab/' }}
+          # Sayt huquqologiya.uz domenining ildizida ishlaydi
+          BASE_PATH: /
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
         with:
