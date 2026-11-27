@@ -3,15 +3,24 @@ import { Link } from 'react-router-dom'
 
 // ====== TAHRIRLASH UCHUN: ustoz ma'lumotlari ======
 const TEACHER = {
-  name: "Oybek Po'latjonov",
-  role: "Huquqologiya qo'llanmalari va testlar to'plami muallifi",
+  name: "Po'latjonov Oybek",
+  role: "Huquqologiya o'quv kursi ustozi",
   initials: 'OP',
   photo: '' as string, // masalan: 'landing/ustoz.jpg' (public/ ichida). Bo'sh bo'lsa — bosh harflar chiqadi.
   bio: [
-    "Oybek Po'latjonov — huquqshunoslik fanini Milliy sertifikat va OTM (DTM) imtihonlariga tayyorlovchi ustoz. U \"Huquqologiya\" qo'llanmalari (I, II, III qism) va \"Testlar to'plami\" muallifi.",
-    "Ustoz murakkab qonun matnlarini oddiy, tushunarli tilda — darslik, qonun va izoh bilan yonma-yon ko'rsatib tushuntiradi. Maqsad: yodlash emas, tushunib o'zlashtirish.",
+    "Imtihondan o'zi yuqori natija bilan o'tgan ustoz sizga ham shu yo'lni o'rgatadi: qaysi mavzularga e'tibor berish, murakkab testlarni qanday yechish va imtihonda vaqtni qanday taqsimlash.",
+    "\"Huquqologiya\" qo'llanmalari (I, II, III qism) va \"Testlar to'plami\" muallifi.",
   ],
-  facts: [['3', "qo'llanma qismi"], ['2000+', 'test'], ['40', 'qonun']] as [string, string][],
+  cv: [
+    ['DTM, 2021', "186,9 ball — Toshkent davlat yuridik universiteti, Yurisprudensiya (jinoyat-huquqiy faoliyat)"],
+    ['Bakalavr, 2025', 'TDYU — Yurist'],
+    ['Magistr, 2026', 'TDYU, Mehnat huquqi — Yurist'],
+    ['Amaliyot', 'Sud va adliya tizimida amaliy tajriba'],
+    ['Hozirda', "IIV akademik litsey huquqshunoslik fani o'qituvchisi"],
+  ] as [string, string][],
+  group: "Kechki guruh: 18:00–20:00, online darslar ham bor",
+  docs: [['landing/diplom-bakalavr.jpg', 'Bakalavr diplomi · TDYU · 2025'], ['landing/diplom-magistr.jpg', 'Magistr diplomi · TDYU · 2026']] as [string, string][],
+  facts: [['186,9', 'DTM bali'], ['3', "qo'llanma qismi"], ['2000+', 'test']] as [string, string][],
 }
 // ==================================================
 
@@ -137,6 +146,12 @@ export default function Landing() {
           <Rv d={0.1}>
             <div className="mb-3 font-semibold text-[#d7262f]">{TEACHER.role}</div>
             {TEACHER.bio.map((p, i) => <p key={i} className="mb-3 mt-0 leading-relaxed text-slate-600">{p}</p>)}
+            <ul className="mb-4 mt-1 flex list-none flex-col gap-2 p-0">
+              {TEACHER.cv.map(([k, v]) => (
+                <li key={k} className="flex gap-3 text-sm leading-snug"><span className="w-28 shrink-0 font-semibold text-[#13294b]">{k}</span><span className="text-slate-600">{v}</span></li>
+              ))}
+            </ul>
+            <p className="mb-4 mt-0 rounded-xl bg-orange-50 px-4 py-3 text-sm font-semibold text-[#13294b]">🕕 {TEACHER.group}<br /><span className="font-normal">Ro'yxatdan o'tish: <a href={TEL}>{PHONE}</a> · <a href="https://t.me/Oybeck" target="_blank" rel="noreferrer">@Oybeck</a></span></p>
             <div className="mt-5 flex gap-3">
               {TEACHER.facts.map(([n, l]) => (
                 <div key={l} className="flex-1 rounded-2xl border border-line bg-bg p-3 text-center">
@@ -147,6 +162,16 @@ export default function Landing() {
             </div>
           </Rv>
         </div>
+        <Rv>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {TEACHER.docs.map(([src, cap]) => (
+              <figure key={src} className="m-0 overflow-hidden rounded-2xl border border-line bg-white shadow-lg">
+                <img src={import.meta.env.BASE_URL + src} alt={cap} loading="lazy" className="block h-auto w-full" />
+                <figcaption className="px-4 py-2 text-center text-sm text-muted">{cap}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </Rv>
       </section>
 
       {/* Kurs */}
