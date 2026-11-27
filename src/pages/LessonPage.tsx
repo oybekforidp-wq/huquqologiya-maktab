@@ -1,0 +1,185 @@
+import { lazy, Suspense, useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../lib/auth'
+import { fileUrl, safeName, toLocalInput, uploadFile } from '../lib/data'
+import { useQuery, must } from '../lib/useQuery'
+import { fmtDateTime } from '../lib/format'
+import { Badge, ErrorBox, PageHead, Spinner } from '../components/ui'
+import { Icon } from '../components/Icon'
+import { KIND_LABEL, type Assignment, type Lesson, type Profile } from '../lib/types'
+
+const Board = lazy(() => import('../components/Board').then((m) => ({ default: m.Board })))
+
+export default function LessonPage() {
+  const { id } = useParams()
+  const { profile } = useAuth()
+  const lesson = useQuery(() => must<Lesson>(supabase.from('lessons').select('*').eq('id', id!).single()), [id])
+  const [canEdit, setCanEdit] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const l = lesson.data
+
+  useEffect(() => {
+    if (!l) return
+    supabase.rpc('teaches', { gid: l.group_id }).then(({ data }) => setCanEdit(!!data))
+    if (profile!.role === 'student') supabase.rpc('join_lesson', { p_lesson: l.id })
+  }, [l?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Dars holati (jonli/yakunlangan) o'zgarsa darhol yangilanadi
+  useEffect(() => {
+    if (!id) return
+    const ch = supabase.channel('lesson-' + id)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'lessons', filter: `id=eq.${id}` }, () => lesson.reload())
+      .subscribe()
+    return () => { supabase.removeChannel(ch) }
+  }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (lesson.loading && !l) return <Spinner />
+  if (!l) return <ErrorBox text="Dars topilmadi" />
+
+  const set = async (patch: Partial<Lesson>) => {
+    setErr(null)
+    const { error } = await supabase.from('lessons').update(patch).eq('id', l.id)
+    if (error) setErr(error.message); else lesson.reload()
+  }
+
+  return (
+    <>
+      <PageHead back="/darslar" title={l.title} sub={fmtDateTime(l.starts_at)}
+        right={<div className="flex flex-wrap items-center gap-2">
+          {l.is_live ? <Badge color="red">● Jonli</Badge> : l.ended_at ? <Badge>Yakunlangan</Badge> : <Badge color="blue">Rejada</Badge>}
+          {l.meeting_url && !l.ended_at && <a href={l.meeting_url} target="_blank" rel="noreferrer" className="btn-primary no-underline">Video darsga kirish</a>}
+          {canEdit && !l.is_live && !l.ended_at && <button className="btn-primary" onClick={() => set({ is_live: true })}>Darsni boshlash</button>}
+          {canEdit && l.is_live && <button className="btn-ghost" onClick={() => confirm('Dars yakunlansinmi? Doska saqlanadi.') && set({ is_live: false, ended_at: new Date().toISOString() })}>Darsni yakunlash</button>}
+        </div>} />
+      {err && <div className="mb-4"><ErrorBox text={err} /></div>}
+
+      {l.recording_url && (
+        <a href={l.recording_url} target="_blank" rel="noreferrer" className="card mb-5 flex items-center gap-3 p-4 font-semibold no-underline">▶ Dars videosini ko'rish</a>
+      )}
+
+      <section className="mb-6">
+        <Suspense fallback={<Spinner label="Doska yuklanmoqda…" />}>
+          <Board lessonId={l.id} canEdit={canEdit} live={l.is_live} />
+        </Suspense>
+        {!canEdit && l.is_live && <p className="mt-2 text-sm text-muted">O'qituvchi doskada nima yozsa, shu yerda darhol ko'rinadi.</p>}
+      </section>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Files lessonId={l.id} canEdit={canEdit} />
+        <LessonTasks lesson={l} />
+        {canEdit && <Settings lesson={l} save={set} />}
+        {canEdit && <Attendance lesson={l} />}
+      </div>
+    </>
+  )
+}
+
+function Files({ lessonId, canEdit }: { lessonId: string; canEdit: boolean }) {
+  const files = useQuery(() => must<{ id: string; name: string; path: string }[]>(supabase.from('lesson_files').select('*').eq('lesson_id', lessonId).order('created_at')), [lessonId])
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const add = async (f: File) => {
+    setBusy(true); setErr(null)
+    try {
+      const path = await uploadFile(`${lessonId}/files/${safeName(f.name)}`, f)
+      const { error } = await supabase.from('lesson_files').insert({ lesson_id: lessonId, name: f.name, path })
+      if (error) throw new Error(error.message)
+      files.reload()
+    } catch (e) { setErr((e as Error).message) } finally { setBusy(false) }
+  }
+  const open = async (path: string) => window.open(await fileUrl(path), '_blank')
+  const del = async (id: string) => { await supabase.from('lesson_files').delete().eq('id', id); files.reload() }
+  return (
+    <section className="card p-5">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="m-0 text-lg font-bold">Dars fayllari</h2>
+        {canEdit && <label className="btn-ghost h-9 cursor-pointer px-3 text-sm"><Icon name="upload" size={16} />{busy ? 'Yuklanmoqda…' : 'Fayl qo\'shish'}
+          <input type="file" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) add(f); e.target.value = '' }} /></label>}
+      </div>
+      {err && <ErrorBox text={err} />}
+      {!files.data?.length && <div className="text-sm text-muted">Fayl yo'q</div>}
+      <div className="flex flex-col gap-1">
+        {files.data?.map((f) => (
+          <div key={f.id} className="flex items-center gap-2">
+            <button className="flex-1 cursor-pointer truncate rounded-lg border-0 bg-transparent px-2 py-2 text-left text-brand hover:bg-bg" onClick={() => open(f.path)}>{f.name}</button>
+            {canEdit && <button className="btn-ghost h-8 px-2" aria-label="O'chirish" onClick={() => del(f.id)}><Icon name="trash" size={16} /></button>}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function LessonTasks({ lesson }: { lesson: Lesson }) {
+  const tasks = useQuery(() => must<Assignment[]>(supabase.from('assignments').select('id, group_id, lesson_id, title, kind, instructions, due_at, max_score').eq('lesson_id', lesson.id)), [lesson.id])
+  return (
+    <section className="card p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="m-0 text-lg font-bold">Shu dars vazifalari</h2>
+        <Link to={`/vazifalar?dars=${lesson.id}`} className="text-sm font-semibold">Vazifalar</Link>
+      </div>
+      {!tasks.data?.length && <div className="text-sm text-muted">Vazifa yo'q</div>}
+      {tasks.data?.map((t) => (
+        <Link key={t.id} to={`/vazifa/${t.id}`} className="flex items-center justify-between gap-3 rounded-lg px-2 py-2 text-ink no-underline hover:bg-bg">
+          <span className="font-semibold">{t.title}</span><Badge>{KIND_LABEL[t.kind]}</Badge>
+        </Link>
+      ))}
+    </section>
+  )
+}
+
+function Settings({ lesson, save }: { lesson: Lesson; save: (p: Partial<Lesson>) => Promise<void> }) {
+  const [title, setTitle] = useState(lesson.title)
+  const [at, setAt] = useState(toLocalInput(lesson.starts_at))
+  const [url, setUrl] = useState(lesson.meeting_url ?? '')
+  const [rec, setRec] = useState(lesson.recording_url ?? '')
+  return (
+    <section className="card flex flex-col gap-3 p-5">
+      <h2 className="m-0 text-lg font-bold">Dars sozlamalari</h2>
+      <label className="label">Mavzu<input className="input" value={title} onChange={(e) => setTitle(e.target.value)} /></label>
+      <label className="label">Vaqti<input className="input" type="datetime-local" value={at} onChange={(e) => setAt(e.target.value)} /></label>
+      <label className="label">Video havola (Zoom / Meet)<input className="input" value={url} onChange={(e) => setUrl(e.target.value)} /></label>
+      <label className="label">Dars yozuvi havolasi (YouTube yopiq / Google Drive)<input className="input" value={rec} onChange={(e) => setRec(e.target.value)} /></label>
+      <div><button className="btn-primary" onClick={() => save({ title, starts_at: new Date(at).toISOString(), meeting_url: url || null, recording_url: rec || null })}>Saqlash</button></div>
+    </section>
+  )
+}
+
+const ATT = [['present', 'Keldi', 'green'], ['late', 'Kech', 'amber'], ['absent', 'Kelmadi', 'red']] as const
+
+function Attendance({ lesson }: { lesson: Lesson }) {
+  const data = useQuery(async () => {
+    const [stu, att] = await Promise.all([
+      must<{ profiles: Profile }[]>(supabase.from('enrollments').select('profiles(*)').eq('group_id', lesson.group_id)),
+      must<{ student_id: string; status: string }[]>(supabase.from('attendance').select('student_id, status').eq('lesson_id', lesson.id)),
+    ])
+    return { stu: stu.map((s) => s.profiles).filter(Boolean).sort((a, b) => a.full_name.localeCompare(b.full_name)), att: new Map(att.map((a) => [a.student_id, a.status])) }
+  }, [lesson.id])
+  const mark = async (sid: string, status: string) => {
+    await supabase.from('attendance').upsert({ lesson_id: lesson.id, student_id: sid, status, marked_at: new Date().toISOString() })
+    data.reload()
+  }
+  return (
+    <section className="card p-5 lg:col-span-1">
+      <h2 className="m-0 mb-1 text-lg font-bold">Yo'qlama</h2>
+      <p className="m-0 mb-3 text-sm text-muted">Darsga kirgan o'quvchi avtomatik "Keldi" bo'ladi (10 daqiqadan keyin "Kech").</p>
+      {data.loading ? <Spinner /> : !data.data?.stu.length ? <div className="text-sm text-muted">Guruhda o'quvchi yo'q</div> : (
+        <div className="flex flex-col">
+          {data.data.stu.map((s) => {
+            const st = data.data!.att.get(s.id)
+            return (
+              <div key={s.id} className="flex flex-wrap items-center gap-2 border-b border-slate-100 py-2 last:border-0">
+                <span className="min-w-32 flex-1">{s.full_name}</span>
+                {ATT.map(([v, label, c]) => (
+                  <button key={v} onClick={() => mark(s.id, v)} aria-pressed={st === v}
+                    className={`h-8 cursor-pointer rounded-lg px-3 text-xs font-semibold ${st === v ? (c === 'green' ? 'border-0 bg-green-600 text-white' : c === 'amber' ? 'border-0 bg-amber-500 text-white' : 'border-0 bg-red-600 text-white') : 'border border-field bg-white text-ink'}`}>{label}</button>
+                ))}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </section>
+  )
+}

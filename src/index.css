@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --color-ink: #0F1B2D;
+  --color-muted: #4B5563;
+  --color-line: #E5E9F2;
+  --color-field: #CBD2DF;
+  --color-bg: #F5F7FB;
+  --color-brand: #1D4ED8;
+  --color-brand-dark: #1E3A8A;
+  --color-brand-soft: #DBE4FF;
+}
+
+body { margin: 0; background: var(--color-bg); color: var(--color-ink); font-family: var(--font-sans); }
+input, select, textarea, button { font: inherit; }
+@utility btn { @apply inline-flex items-center justify-center gap-2 h-11 px-4 rounded-xl font-semibold transition disabled:opacity-50 cursor-pointer; }
+@utility btn-primary { @apply btn bg-brand text-white hover:bg-brand-dark border-0; }
+@utility btn-ghost { @apply btn border border-field bg-white text-ink hover:bg-bg; }
+@utility input { @apply h-12 w-full rounded-xl border border-field bg-white px-3.5 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand-soft; }
+@utility card { @apply bg-white border border-line rounded-2xl; }
+@utility label { @apply flex flex-col gap-1.5 text-sm font-medium; }
