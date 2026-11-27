@@ -8,6 +8,7 @@ import { fmtDateTime } from '../lib/format'
 import { Badge, Empty, ErrorBox, PageHead, Spinner } from '../components/ui'
 import { GroupTabs, useGroupSel } from '../components/GroupTabs'
 import { Icon } from '../components/Icon'
+import { BankPicker } from '../components/BankPicker'
 import { KIND_LABEL, type Assignment, type AssignmentKind, type Lesson, type Question, type Submission } from '../lib/types'
 
 export default function Tasks() {
@@ -129,6 +130,7 @@ function NewTask({ gid, lessonId, done }: { gid: string; lessonId: string | null
       <label className="label">{kind === 'kazus' ? 'Kazus matni va savollar' : kind === 'test' ? "Izoh (ixtiyoriy)" : 'Vazifa sharti'}
         <textarea className="input min-h-28 py-3" value={instr} onChange={(e) => setInstr(e.target.value)} placeholder={kind === 'kazus' ? "Fuqaro A. 2019-yilda... Savol: A.ning harakatiga huquqiy baho bering." : kind === 'file' ? "Daftaringizdagi ishni rasmga olib yuklang" : ''} />
       </label>
+      {kind === 'test' && <BankPicker onAdd={(t) => setQtext((qtext.trim() ? qtext.trim() + '\n\n' : '') + t)} />}
       {kind === 'test' && (
         <label className="label">Savollar — har savol orasida bo'sh qator, to'g'ri javob oldiga * qo'ying
           <textarea className="input min-h-64 py-3 font-mono text-sm" value={qtext} onChange={(e) => setQtext(e.target.value)}
