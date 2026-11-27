@@ -28,6 +28,7 @@ const PARENT: Item[] = [
 const ADMIN: Item[] = [
   { to: '/admin/arizalar', label: 'Arizalar', icon: 'inbox' },
   { to: '/admin/fanlar', label: 'Fanlar va guruhlar', icon: 'book' },
+  { to: '/admin/kurs', label: 'Kurs shabloni', icon: 'book' },
   { to: '/admin/foydalanuvchilar', label: 'Foydalanuvchilar', icon: 'users' },
   { to: '/admin/reyting', label: "Ustoz reytingi", icon: 'grades' },
 ]

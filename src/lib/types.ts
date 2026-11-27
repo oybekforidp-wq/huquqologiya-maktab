@@ -51,3 +51,8 @@ export interface RatingSummary {
   lesson_avg: number | null; lesson_count: number; parent_avg: number | null; parent_count: number
   comments: { stars: number; comment: string; created_at: string; source: 'student' | 'parent' }[]
 }
+
+export interface CourseLesson {
+  id: string; subject_id: string; num: number; title: string; module: string | null; type: string | null
+  pdf_path: string | null; key_path: string | null; updated_at: string
+}

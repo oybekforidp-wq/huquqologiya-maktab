@@ -30,8 +30,10 @@ export async function uploadFile(path: string, file: File) {
   if (error) throw new Error(error.message)
   return path
 }
+// 'kurs/...' yo'llari yopiq kurs shabloni bucket'ida (Dars N fayllari)
 export async function fileUrl(path: string) {
-  const { data, error } = await supabase.storage.from('maktab').createSignedUrl(path, 3600)
+  const [bucket, p] = path.startsWith('kurs/') ? ['kurs', path.slice(5)] : ['maktab', path]
+  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(p, 3600)
   if (error) throw new Error(error.message)
   return data.signedUrl
 }
