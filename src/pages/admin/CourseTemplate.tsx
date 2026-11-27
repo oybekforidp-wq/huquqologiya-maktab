@@ -84,6 +84,8 @@ export default function CourseTemplate() {
               <span className="w-10 font-bold">{d.num}</span>
               <span className="min-w-48 flex-1">{d.title}</span>
               {d.type === 'nazorat' && <Badge color="amber">Nazorat</Badge>}
+              {d.type === 'sinov' && <Badge color="red">Sinov imtihoni</Badge>}
+              {d.type === 'takror' && <Badge color="blue">Takror</Badge>}
               {d.pdf_path && <button className="btn-ghost h-8 px-2 text-xs" onClick={() => open(d.pdf_path!)}>PDF</button>}
               {d.key_path && <button className="btn-ghost h-8 px-2 text-xs" onClick={() => open(d.key_path!)}>Kalit</button>}
             </div>
