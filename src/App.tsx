@@ -16,6 +16,7 @@ import Applications from './pages/admin/Applications'
 import Subjects from './pages/admin/Subjects'
 import Users from './pages/admin/Users'
 import Ratings from './pages/admin/Ratings'
+import CourseTemplate from './pages/admin/CourseTemplate'
 import ParentHome from './pages/parent/ParentHome'
 import ChildPage from './pages/parent/ChildPage'
 import ParentFeedback from './pages/parent/ParentFeedback'
@@ -55,6 +56,7 @@ function Gate() {
         {admin && <Route path="admin/fanlar" element={<Subjects />} />}
         {admin && <Route path="admin/foydalanuvchilar" element={<Users />} />}
         {admin && <Route path="admin/reyting" element={<Ratings />} />}
+        {admin && <Route path="admin/kurs" element={<CourseTemplate />} />}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

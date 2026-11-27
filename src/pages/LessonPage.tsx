@@ -7,7 +7,7 @@ import { useQuery, must } from '../lib/useQuery'
 import { fmtDateTime } from '../lib/format'
 import { Badge, ErrorBox, PageHead, Spinner } from '../components/ui'
 import { Icon } from '../components/Icon'
-import { KIND_LABEL, type Assignment, type Lesson, type LessonLinks, type Profile } from '../lib/types'
+import { KIND_LABEL, type Assignment, type CourseLesson, type Lesson, type LessonLinks, type Profile } from '../lib/types'
 import { PayNote } from './Lessons'
 
 const Board = lazy(() => import('../components/Board').then((m) => ({ default: m.Board })))
@@ -20,6 +20,7 @@ export default function LessonPage() {
   const [open, setOpen] = useState<boolean | null>(null)
   const links = useQuery(async () => id ? ((await supabase.from('lesson_links').select('meeting_url, recording_url').eq('lesson_id', id).maybeSingle()).data as LessonLinks | null) : null, [id, open])
   const [err, setErr] = useState<string | null>(null)
+  const [ver, setVer] = useState(0)
   const l = lesson.data
 
   useEffect(() => {
@@ -80,12 +81,63 @@ export default function LessonPage() {
       </section>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <Files lessonId={l.id} canEdit={canEdit} />
-        <LessonTasks lesson={l} />
+        {canEdit && <CourseAttach lesson={l} done={() => { setVer((v) => v + 1); lesson.reload() }} />}
+        <Files key={'f' + ver} lessonId={l.id} canEdit={canEdit} />
+        <LessonTasks key={'t' + ver} lesson={l} />
         {canEdit && !links.loading && <Settings lesson={l} links={lk} save={set} saveLinks={async (v) => { setErr(null); const { error } = await supabase.from('lesson_links').upsert({ lesson_id: l.id, ...v }); if (error) setErr(error.message); else links.reload() }} />}
         {canEdit && <Attendance lesson={l} />}
       </div>
     </>
+  )
+}
+
+// Kurs shablonidan "Dars N" biriktirish: dars PDF + sinf/uy testlari + yozma + kazus. Kalit faqat ustozga.
+function CourseAttach({ lesson, done }: { lesson: Lesson; done: () => void }) {
+  const list = useQuery(async () => {
+    const g = await must<{ subject_id: string }>(supabase.from('groups').select('subject_id').eq('id', lesson.group_id).single())
+    return must<CourseLesson[]>(supabase.from('course_lessons').select('id, subject_id, num, title, module, type, pdf_path, key_path, updated_at').eq('subject_id', g.subject_id).order('num'))
+  }, [lesson.group_id])
+  const cur = useQuery(async () => (await supabase.rpc('course_lesson_for_staff', { p_lesson: lesson.id })).data as CourseLesson | null, [lesson.id, lesson.title])
+  const [num, setNum] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState<string | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+  if (list.loading) return null
+  if (!list.data?.length) return null
+  const attach = async () => {
+    const n = Number(num || cur.data?.num)
+    if (!n) return
+    if (cur.data && !confirm(`Avvalgi biriktirish (${cur.data.num}-dars) almashtirilsinmi? Javob topshirilgan vazifalar saqlanadi.`)) return
+    setBusy(true); setErr(null); setMsg(null)
+    const { data, error } = await supabase.rpc('attach_course_lesson', { p_lesson: lesson.id, p_num: n, p_set_title: true })
+    setBusy(false)
+    if (error) { setErr(error.message); return }
+    setMsg(`${data.num}-dars biriktirildi: fayl + ${data.assignments} ta vazifa.`)
+    cur.reload(); done()
+  }
+  const open = async (p: string) => window.open(await fileUrl('kurs/' + p), '_blank')
+  return (
+    <section className="card flex flex-col gap-3 p-5 lg:col-span-2">
+      <h2 className="m-0 text-lg font-bold">Kurs dasturidan dars</h2>
+      {cur.data && (
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <Badge color="green">{cur.data.num}-dars biriktirilgan</Badge>
+          {cur.data.key_path && <button className="btn-ghost h-8 px-3 text-sm" onClick={() => open(cur.data!.key_path!)}>🔑 Kalit (faqat ustoz)</button>}
+        </div>
+      )}
+      <div className="flex flex-wrap items-end gap-3">
+        <label className="label min-w-60 flex-1">Dars
+          <select className="input" value={num || String(cur.data?.num ?? '')} onChange={(e) => setNum(e.target.value)}>
+            <option value="">— tanlang —</option>
+            {list.data.map((d) => <option key={d.id} value={d.num}>{d.num}-dars. {d.title.slice(0, 90)}</option>)}
+          </select>
+        </label>
+        <button className="btn-primary h-12" disabled={busy || !(num || cur.data)} onClick={attach}>{busy ? 'Biriktirilmoqda…' : 'Biriktirish'}</button>
+      </div>
+      <p className="m-0 text-sm text-muted">Biriktirilganda dars PDF fayli, sinf testi, uy testi, yozma topshiriq va kazus vazifalari yaratiladi. O'quvchi ularni faqat to'lov amal qilsa (yoki birinchi tekin darsda) ko'radi.</p>
+      {msg && <div className="text-sm font-semibold text-green-700">{msg}</div>}
+      {err && <ErrorBox text={err} />}
+    </section>
   )
 }
 
