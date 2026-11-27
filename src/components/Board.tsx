@@ -10,7 +10,7 @@ import { Icon } from './Icon'
 import { ErrorBox } from './ui'
 
 declare global { interface Window { EXCALIDRAW_ASSET_PATH?: string } }
-window.EXCALIDRAW_ASSET_PATH = '/excalidraw-assets/'
+window.EXCALIDRAW_ASSET_PATH = import.meta.env.BASE_URL + 'excalidraw-assets/'
 
 type Scene = { elements?: ExcalidrawElement[]; bg?: { w: number; h: number } }
 interface Page { id: string; lesson_id: string; position: number; kind: 'blank' | 'image'; title: string | null; background_path: string | null; scene: Scene }

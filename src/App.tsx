@@ -8,6 +8,8 @@ import Home from './pages/Home'
 import Soon from './pages/Soon'
 import Lessons from './pages/Lessons'
 import LessonPage from './pages/LessonPage'
+import Tasks from './pages/Tasks'
+import TaskPage from './pages/TaskPage'
 import Applications from './pages/admin/Applications'
 import Subjects from './pages/admin/Subjects'
 import Users from './pages/admin/Users'
@@ -24,8 +26,8 @@ function Gate() {
         <Route index element={<Home />} />
         <Route path="darslar" element={<Lessons />} />
         <Route path="dars/:id" element={<LessonPage />} />
-        <Route path="vazifalar" element={<Soon title="Vazifalar" />} />
-        <Route path="vazifa/:id" element={<Soon title="Vazifa" />} />
+        <Route path="vazifalar" element={<Tasks />} />
+        <Route path="vazifa/:id" element={<TaskPage />} />
         <Route path="baholar" element={<Soon title="Baholarim" />} />
         <Route path="jurnal" element={<Soon title="Jurnal" />} />
         {admin && <Route path="admin/arizalar" element={<Applications />} />}
@@ -40,7 +42,7 @@ function Gate() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter><Gate /></BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "")}><Gate /></BrowserRouter>
     </AuthProvider>
   )
 }
