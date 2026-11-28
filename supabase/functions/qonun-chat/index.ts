@@ -2,7 +2,9 @@
 // Supabase Dashboard → Edge Functions → nomi: qonun-chat. Secret: GEMINI_API_KEY (Google AI Studio).
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const KEY = Deno.env.get('GEMINI_API_KEY') ?? ''
+// Kalit nomi boshqacha yozilgan bo'lsa ham topiladi (Google kalitlari "AIza" bilan boshlanadi)
+const KEY = Deno.env.get('GEMINI_API_KEY') ||
+  Object.entries(Deno.env.toObject()).find(([k, v]) => /gemini/i.test(k) && v.trim().startsWith('AIza'))?.[1].trim() || ''
 const MAIN = Deno.env.get('GEMINI_MODEL') ?? 'gemini-flash-latest'
 const LITE = Deno.env.get('GEMINI_MODEL_LITE') ?? 'gemini-flash-lite-latest'
 const FALLBACK: Record<string, string> = { 'gemini-flash-latest': 'gemini-2.5-flash', 'gemini-flash-lite-latest': 'gemini-2.5-flash-lite' }
