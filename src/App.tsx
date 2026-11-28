@@ -17,6 +17,8 @@ import Subjects from './pages/admin/Subjects'
 import Users from './pages/admin/Users'
 import Ratings from './pages/admin/Ratings'
 import CourseTemplate from './pages/admin/CourseTemplate'
+import LawBase from './pages/admin/LawBase'
+import Assistant from './pages/Assistant'
 import ParentHome from './pages/parent/ParentHome'
 import ChildPage from './pages/parent/ChildPage'
 import ParentFeedback from './pages/parent/ParentFeedback'
@@ -38,6 +40,7 @@ function Gate() {
         <Route index element={<ParentHome />} />
         <Route path="farzand/:id" element={<ChildPage />} />
         <Route path="fikr" element={<ParentFeedback />} />
+        <Route path="yordamchi" element={<Assistant />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
@@ -52,11 +55,13 @@ function Gate() {
         <Route path="vazifa/:id" element={<TaskPage />} />
         <Route path="baholar" element={<Grades />} />
         <Route path="jurnal" element={<Journal />} />
+        <Route path="yordamchi" element={<Assistant />} />
         {admin && <Route path="admin/arizalar" element={<Applications />} />}
         {admin && <Route path="admin/fanlar" element={<Subjects />} />}
         {admin && <Route path="admin/foydalanuvchilar" element={<Users />} />}
         {admin && <Route path="admin/reyting" element={<Ratings />} />}
         {admin && <Route path="admin/kurs" element={<CourseTemplate />} />}
+        {admin && <Route path="admin/qonunlar" element={<LawBase />} />}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

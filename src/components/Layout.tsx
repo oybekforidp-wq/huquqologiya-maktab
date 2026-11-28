@@ -14,21 +14,25 @@ const STUDENT: Item[] = [
   { to: '/darslar', label: 'Darslar', icon: 'lessons' },
   { to: '/vazifalar', label: 'Vazifalar', icon: 'tasks' },
   { to: '/baholar', label: 'Baholarim', icon: 'grades' },
+  { to: '/yordamchi', label: 'AI yordamchi', icon: 'chat' },
 ]
 const STAFF: Item[] = [
   { to: '/', label: 'Bosh sahifa', icon: 'home', end: true },
   { to: '/darslar', label: 'Darslar', icon: 'lessons' },
   { to: '/vazifalar', label: 'Vazifalar', icon: 'tasks' },
   { to: '/jurnal', label: 'Jurnal', icon: 'journal' },
+  { to: '/yordamchi', label: 'AI yordamchi', icon: 'chat' },
 ]
 const PARENT: Item[] = [
   { to: '/', label: 'Farzandlarim', icon: 'users', end: true },
   { to: '/fikr', label: 'Fikr va baho', icon: 'grades' },
+  { to: '/yordamchi', label: 'AI yordamchi', icon: 'chat' },
 ]
 const ADMIN: Item[] = [
   { to: '/admin/arizalar', label: 'Arizalar', icon: 'inbox' },
   { to: '/admin/fanlar', label: 'Fanlar va guruhlar', icon: 'book' },
   { to: '/admin/kurs', label: 'Kurs shabloni', icon: 'book' },
+  { to: '/admin/qonunlar', label: 'Qonunlar bazasi', icon: 'scale' },
   { to: '/admin/foydalanuvchilar', label: 'Foydalanuvchilar', icon: 'users' },
   { to: '/admin/reyting', label: "Ustoz reytingi", icon: 'grades' },
 ]
@@ -108,7 +112,7 @@ export function Layout() {
       <nav className="fixed inset-x-0 bottom-0 z-10 grid h-[68px] border-t border-line bg-white md:hidden" style={{ gridTemplateColumns: `repeat(${main.length}, minmax(0, 1fr))` }}>
         {main.map((it) => (
           <NavLink key={it.to} to={it.to} end={it.end}
-            className={({ isActive }) => `flex flex-col items-center justify-center gap-1 text-xs no-underline ${isActive ? 'font-semibold text-brand' : 'text-muted'}`}>
+            className={({ isActive }) => `flex flex-col items-center justify-center gap-1 text-center text-xs leading-tight no-underline ${isActive ? 'font-semibold text-brand' : 'text-muted'}`}>
             <Icon name={it.icon} size={22} />{it.label}
           </NavLink>
         ))}

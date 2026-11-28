@@ -17,6 +17,8 @@ const P: Record<string, string> = {
   download: 'M12 3v12M7 10l5 5 5-5M5 21h14',
   trash: 'M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6',
   journal: 'M4 4h16v16H4zM4 10h16M10 4v16',
+  chat: 'M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12zM8 11h.01M12 11h.01M16 11h.01',
+  send: 'M22 2L11 13M22 2l-7 20-4-9-9-4z',
 }
 
 export function Icon({ name, size = 20, className = '' }: { name: keyof typeof P | string; size?: number; className?: string }) {
