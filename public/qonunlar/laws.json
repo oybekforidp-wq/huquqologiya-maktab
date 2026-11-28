@@ -1,0 +1,237 @@
+[
+{
+"key": "fk1",
+"name": "Fuqarolik kodeksi (birinchi qism)",
+"url": "https://lex.uz/uz/docs/111189"
+},
+{
+"key": "jk",
+"name": "Jinoyat kodeksi",
+"url": "https://lex.uz/uz/docs/111453"
+},
+{
+"key": "jpk",
+"name": "Jinoyat-protsessual kodeksi",
+"url": "https://lex.uz/uz/docs/111460"
+},
+{
+"key": "mjtk",
+"name": "Maʼmuriy javobgarlik toʻgʻrisidagi kodeks",
+"url": "https://lex.uz/uz/docs/97664"
+},
+{
+"key": "istemolchi",
+"name": "«Isteʼmolchilarning huquqlarini himoya qilish toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/4704"
+},
+{
+"key": "jamoat-birlashmalari",
+"name": "«Jamoat birlashmalari toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/111825"
+},
+{
+"key": "saylov",
+"name": "Saylov kodeksi",
+"url": "https://lex.uz/uz/docs/4386848"
+},
+{
+"key": "prokuratura",
+"name": "«Prokuratura toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/106197"
+},
+{
+"key": "budjet",
+"name": "Budjet kodeksi",
+"url": "https://lex.uz/uz/docs/2304138"
+},
+{
+"key": "referendum",
+"name": "«Referendum toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/81253"
+},
+{
+"key": "mehnat",
+"name": "Mehnat kodeksi",
+"url": "https://lex.uz/uz/docs/6257288"
+},
+{
+"key": "fk2",
+"name": "Fuqarolik kodeksi (ikkinchi qism)",
+"url": "https://lex.uz/uz/docs/180552"
+},
+{
+"key": "oila",
+"name": "Oila kodeksi",
+"url": "https://lex.uz/uz/docs/104720"
+},
+{
+"key": "konstitutsiya",
+"name": "Oʻzbekiston Respublikasi Konstitutsiyasi",
+"url": "https://lex.uz/uz/docs/6445145"
+},
+{
+"key": "soliq",
+"name": "Soliq kodeksi",
+"url": "https://lex.uz/uz/docs/4674902"
+},
+{
+"key": "partiyalar",
+"name": "«Siyosiy partiyalar toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/54191"
+},
+{
+"key": "notariat",
+"name": "«Notariat toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/54458"
+},
+{
+"key": "advokatura",
+"name": "«Advokatura toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/54503"
+},
+{
+"key": "bayroq",
+"name": "«Davlat bayrogʻi toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/100122"
+},
+{
+"key": "gerb",
+"name": "«Davlat gerbi toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/17260"
+},
+{
+"key": "tabiat",
+"name": "«Tabiatni muhofaza qilish toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/107115"
+},
+{
+"key": "madhiya",
+"name": "«Davlat madhiyasi toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/38608"
+},
+{
+"key": "mahalliy-hokimiyat",
+"name": "«Mahalliy davlat hokimiyati toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Mahalliy%20davlat%20hokimiyati%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "ombudsman",
+"name": "«Inson huquqlari boʻyicha vakil (ombudsman) toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/7223219"
+},
+{
+"key": "fozobo",
+"name": "«Fuqarolarning oʻzini oʻzi boshqarish organlari toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Fuqarolarning%20o%CA%BBzini%20o%CA%BBzi%20boshqarish%20organlari%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "mualliflik",
+"name": "«Mualliflik huquqi va turdosh huquqlar toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/1022944"
+},
+{
+"key": "murojaatlar",
+"name": "«Jismoniy va yuridik shaxslarning murojaatlari toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/3336169"
+},
+{
+"key": "xalqaro-shartnoma",
+"name": "«Xalqaro shartnomalar toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/4193761"
+},
+{
+"key": "fuqarolik-qonuni",
+"name": "«Oʻzbekiston Respublikasining fuqaroligi toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/4761984"
+},
+{
+"key": "nhh",
+"name": "«Normativ-huquqiy hujjatlar toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/5378966"
+},
+{
+"key": "vijdon",
+"name": "«Vijdon erkinligi va diniy tashkilotlar toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/5491534"
+},
+{
+"key": "sudlar",
+"name": "«Sudlar toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/docs/5534923"
+},
+{
+"key": "vazirlar",
+"name": "«Vazirlar Mahkamasi toʻgʻrisida»gi Konstitutsiyaviy Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Vazirlar%20Mahkamasi%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "huquqiy-madaniyat",
+"name": "Huquqiy ong va huquqiy madaniyat toʻgʻrisidagi PF-5618 farmoni",
+"url": "https://lex.uz/uz/docs/4149765"
+},
+{
+"key": "adliya",
+"name": "Adliya vazirligi faoliyati toʻgʻrisidagi PQ-3666 qarori",
+"url": "https://lex.uz/uz/docs/3681790"
+},
+{
+"key": "milliy-markaz",
+"name": "Inson huquqlari boʻyicha Milliy markaz toʻgʻrisidagi PQ-4056 qarori",
+"url": "https://lex.uz/uz/docs/4098056"
+},
+{
+"key": "mudofaa",
+"name": "«Mudofaa toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Mudofaa%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "msiyuk",
+"name": "Maʼmuriy sud ishlarini yuritish toʻgʻrisidagi kodeks",
+"url": "https://lex.uz/uz/search/nat?query=Ma%CA%BCmuriy%20sud%20ishlarini%20yuritish%20to%CA%BBg%CA%BBrisidagi%20kodeks"
+},
+{
+"key": "senat",
+"name": "«Oliy Majlis Senati toʻgʻrisida»gi Konstitutsiyaviy Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Oliy%20Majlis%20Senati%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "qonunchilik-palatasi",
+"name": "«Oliy Majlis Qonunchilik palatasi toʻgʻrisida»gi Konstitutsiyaviy Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Oliy%20Majlis%20Qonunchilik%20palatasi%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "konstitutsiyaviy-sud",
+"name": "«Konstitutsiyaviy sud toʻgʻrisida»gi Konstitutsiyaviy Qonun",
+"url": "https://lex.uz/uz/docs/8536927"
+},
+{
+"key": "profilaktika",
+"name": "«Huquqbuzarliklar profilaktikasi toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Huquqbuzarliklar%20profilaktikasi%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "sok",
+"name": "«Sudyalar oliy kengashi toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Sudyalar%20oliy%20kengashi%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "bolalar-axborot",
+"name": "«Bolalarni sogʻligʻiga zarar yetkazuvchi axborotdan himoya qilish toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Bolalarni%20sog%CA%BBlig%CA%BBiga%20zarar%20yetkazuvchi%20axborotdan%20himoya%20qilish%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "dxx",
+"name": "«Davlat xavfsizlik xizmati toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Davlat%20xavfsizlik%20xizmati%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "bandlik",
+"name": "«Aholi bandligi toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Aholi%20bandligi%20to%CA%BBg%CA%BBrisida"
+},
+{
+"key": "chet-el",
+"name": "«Chet el fuqarolari va fuqaroligi boʻlmagan shaxslarning huquqiy holati toʻgʻrisida»gi Qonun",
+"url": "https://lex.uz/uz/search/nat?query=Chet%20el%20fuqarolari%20va%20fuqaroligi%20bo%CA%BBlmagan%20shaxslarning%20huquqiy%20holati%20to%CA%BBg%CA%BBrisida"
+}
+]
