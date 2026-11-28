@@ -55,7 +55,10 @@ Deno.serve(async (req) => {
   if (!KEY) return json({ error: "AI kaliti (GEMINI_API_KEY) hali qo'yilmagan" }, 500)
 
   const auth = req.headers.get('Authorization') ?? ''
-  const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: auth } } })
+  // Kalit: so'rovdagi apikey (sayt yuboradi) yoki muhitdagi anon/publishable kalit
+  let pub = req.headers.get('apikey') || Deno.env.get('SUPABASE_ANON_KEY') || ''
+  if (!pub) { try { pub = Object.values(JSON.parse(Deno.env.get('SUPABASE_PUBLISHABLE_KEYS') ?? '{}'))[0] as string } catch { /* yo'q */ } }
+  const sb = createClient(Deno.env.get('SUPABASE_URL')!, pub, { global: { headers: { Authorization: auth } } })
 
   let question = '', history: Turn[] = []
   try {
