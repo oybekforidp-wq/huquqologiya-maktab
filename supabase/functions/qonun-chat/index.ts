@@ -6,8 +6,8 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 const KEY = Deno.env.get('GEMINI_API_KEY') ||
   Object.entries(Deno.env.toObject()).find(([k, v]) => /gemini/i.test(k) && v.trim().startsWith('AIza'))?.[1].trim() || ''
 // Modellar navbat bilan sinab ko'riladi: biri band (503/429) bo'lsa, keyingisi ishlatiladi
-const MAIN = (Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash,gemini-flash-latest,gemini-2.5-flash-lite').split(',')
-const LITE = (Deno.env.get('GEMINI_MODEL_LITE') ?? 'gemini-2.5-flash-lite,gemini-flash-lite-latest,gemini-2.5-flash').split(',')
+const MAIN = (Deno.env.get('GEMINI_MODEL') ?? 'gemini-flash-latest,gemini-flash-lite-latest').split(',')
+const LITE = (Deno.env.get('GEMINI_MODEL_LITE') ?? 'gemini-flash-lite-latest,gemini-flash-latest').split(',')
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -24,8 +24,7 @@ class GeminiError extends Error { constructor(public status: number, msg: string
 async function gemini(models: string[], body: Record<string, unknown>): Promise<string> {
   let last: GeminiError | null = null
   for (const m of models.map((x) => x.trim()).filter(Boolean)) {
-    // 2.5-flash: "o'ylash"ni o'chirib, javobni tezlashtiramiz
-    const gc = { ...(body.generationConfig as object), ...(m === 'gemini-2.5-flash' ? { thinkingConfig: { thinkingBudget: 0 } } : {}) }
+    const gc = body.generationConfig
     let r: Response
     try {
       r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
