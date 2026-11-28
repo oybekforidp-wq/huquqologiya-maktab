@@ -5,9 +5,9 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 // Kalit nomi boshqacha yozilgan bo'lsa ham topiladi (Google kalitlari "AIza" bilan boshlanadi)
 const KEY = Deno.env.get('GEMINI_API_KEY') ||
   Object.entries(Deno.env.toObject()).find(([k, v]) => /gemini/i.test(k) && v.trim().startsWith('AIza'))?.[1].trim() || ''
-const MAIN = Deno.env.get('GEMINI_MODEL') ?? 'gemini-flash-latest'
-const LITE = Deno.env.get('GEMINI_MODEL_LITE') ?? 'gemini-flash-lite-latest'
-const FALLBACK: Record<string, string> = { 'gemini-flash-latest': 'gemini-2.5-flash', 'gemini-flash-lite-latest': 'gemini-2.5-flash-lite' }
+// Modellar navbat bilan sinab ko'riladi: biri band (503/429) bo'lsa, keyingisi ishlatiladi
+const MAIN = (Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash,gemini-flash-latest,gemini-2.5-flash-lite').split(',')
+const LITE = (Deno.env.get('GEMINI_MODEL_LITE') ?? 'gemini-2.5-flash-lite,gemini-flash-lite-latest,gemini-2.5-flash').split(',')
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -21,15 +21,27 @@ type Hit = { law_key: string; law_name: string; url: string; art: string; title:
 
 class GeminiError extends Error { constructor(public status: number, msg: string) { super(msg) } }
 
-async function gemini(model: string, body: unknown): Promise<string> {
-  const call = (m: string) => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY }, body: JSON.stringify(body),
-  })
-  let r = await call(model)
-  if (r.status === 404 && FALLBACK[model]) r = await call(FALLBACK[model])
-  if (!r.ok) throw new GeminiError(r.status, (await r.text()).slice(0, 300))
-  const d = await r.json()
-  return (d.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? '').join('').trim()
+async function gemini(models: string[], body: Record<string, unknown>): Promise<string> {
+  let last: GeminiError | null = null
+  for (const m of models.map((x) => x.trim()).filter(Boolean)) {
+    // 2.5-flash: "o'ylash"ni o'chirib, javobni tezlashtiramiz
+    const gc = { ...(body.generationConfig as object), ...(m === 'gemini-2.5-flash' ? { thinkingConfig: { thinkingBudget: 0 } } : {}) }
+    let r: Response
+    try {
+      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
+        body: JSON.stringify({ ...body, generationConfig: gc }), signal: AbortSignal.timeout(30000),
+      })
+    } catch (e) { last = new GeminiError(504, `${m}: ${(e as Error).message}`); continue }
+    if (r.ok) {
+      const d = await r.json()
+      return (d.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? '').join('').trim()
+    }
+    last = new GeminiError(r.status, `${m}: ${(await r.text()).slice(0, 300)}`)
+    console.error(last.message)
+    if (![404, 429, 500, 503].includes(r.status)) break
+  }
+  throw last ?? new GeminiError(500, 'model yoʻq')
 }
 
 const PLAN_PROMPT = (laws: string) => `Sen huquq bo'yicha savollarni tahlil qiluvchi yordamchisan. Faqat JSON qaytar.
@@ -126,7 +138,7 @@ Deno.serve(async (req) => {
       .map((h) => ({ law: h.law_name, art: h.art, title: h.title, url: h.url }))
     return json({ answer: answer || "Javob olinmadi, qayta urinib ko'ring.", sources, left })
   } catch (e) {
-    if (e instanceof GeminiError && e.status === 429) return json({ error: "AI hozir band (bepul limit). 1-2 daqiqadan keyin qayta urinib ko'ring." }, 503)
+    if (e instanceof GeminiError && [429, 503, 504].includes(e.status)) return json({ error: "AI hozir band (bepul limit). 1-2 daqiqadan keyin qayta urinib ko'ring." }, 503)
     console.error(e)
     return json({ error: 'AI xizmatida xatolik: ' + String((e as Error).message ?? e).slice(0, 200) }, 500)
   }
